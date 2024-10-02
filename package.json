@@ -1,0 +1,26 @@
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "description": "Sample project",
+  "main": "index.js",
+  "scripts": {
+    "static": "serve -p 5050 static",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "node-test"
+  },
+  "keywords": [
+    "nodetst"
+  ],
+  "author": "lorenzolosito91",
+  "license": "MIT",
+  "dependencies": {
+    "@fastify/websocket": "^10.0.1",
+    "fastify": "^4.28.1",
+    "fastify-cli": "^6.2.1",
+    "got": "^14.4.2",
+    "serve": "^14.2.3"
+  }
+}
