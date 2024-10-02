@@ -22,5 +22,6 @@
     "fastify-cli": "^6.2.1",
     "got": "^14.4.2",
     "serve": "^14.2.3"
-  }
+  },
+  "devDependencies": {}
 }
