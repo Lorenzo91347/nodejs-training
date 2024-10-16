@@ -1,12 +1,7 @@
 #!/usr/bin/env node
 //import { got } from "got";
 import { Command } from "commander";
-import {
-    update,
-    add,
-    listCategories,
-    listCategoryItems
-} from "../src/utils.js";
+import { update } from "../src/utils.js";
 // Create a new Command Program
 const program = new Command();
 const API = "http://localhost:3000";
@@ -16,7 +11,7 @@ const usage = (msg = "Back office for My App") => {
     console.log(`\n${msg}\n`);
 };
 // Update the order with the given ID
-/* async function updateItem(id, amount) {
+async function updateItem(id, amount) {
     usage(`Updating order ${id} with amount ${amount}`);
     try {
         if (isNaN(+amount)) {
@@ -34,7 +29,7 @@ const usage = (msg = "Back office for My App") => {
         console.error(err.message);
         process.exit(1);
     }
-} */
+}
 
 // Create a new Program
 program
@@ -51,10 +46,10 @@ program
     // Set the argument AMOUNT to be required
     .argument("<AMOUNT>", "Order Amount")
     // Set the action to be executed when the command is run
-    .action(async (id, amount) => await update(id, amount));
+    .action(async (id, amount) => await updateItem(id, amount));
 
 // Parse the arguments from process.argv
-/* program.parse(); */
+program.parse();
 
 // Create a command for listing categories by IDs
 program
@@ -77,29 +72,5 @@ program
         async (category, id, name, amount, info) =>
             await add(category, id, name, amount, info)
     );
-// Parse the arguments from process.argv
-/* program.parse(); */
 
-// Create a command for listing categories
-program
-    // Set the command name
-    .command("list")
-    // Set the command description
-    .description("List categories")
-    // Set the category to be optional
-    .argument("[CATEGORY]", "Category to list IDs for")
-    // Set the option to list all categories
-    .option("-a, --all", "List all categories")
-    // Set the action to be executed when the command is run
-    .action(async (args, opts) => {
-        if (args && opts.all)
-            throw new Error("Cannot specify both category and 'all'");
-        if (opts.all || args === "all") {
-            listCategories();
-        } else if (args === "confectionery" || args === "electronics") {
-            await listCategoryItems(args);
-        } else {
-            throw new Error("Invalid category specified");
-        }
-    });
-program.parse();
+

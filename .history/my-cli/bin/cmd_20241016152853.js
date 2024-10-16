@@ -1,12 +1,10 @@
 #!/usr/bin/env node
 //import { got } from "got";
 import { Command } from "commander";
-import {
-    update,
-    add,
-    listCategories,
-    listCategoryItems
-} from "../src/utils.js";
+import { update } from "../src/utils.js";
+import { add } from "../src/utils.js";
+import { listCategories } from "../src/utils.js";
+import { listCategoryItems } from "../src/utils.js";
 // Create a new Command Program
 const program = new Command();
 const API = "http://localhost:3000";
@@ -16,7 +14,7 @@ const usage = (msg = "Back office for My App") => {
     console.log(`\n${msg}\n`);
 };
 // Update the order with the given ID
-/* async function updateItem(id, amount) {
+async function updateItem(id, amount) {
     usage(`Updating order ${id} with amount ${amount}`);
     try {
         if (isNaN(+amount)) {
@@ -34,7 +32,7 @@ const usage = (msg = "Back office for My App") => {
         console.error(err.message);
         process.exit(1);
     }
-} */
+}
 
 // Create a new Program
 program
@@ -54,7 +52,7 @@ program
     .action(async (id, amount) => await update(id, amount));
 
 // Parse the arguments from process.argv
-/* program.parse(); */
+program.parse();
 
 // Create a command for listing categories by IDs
 program
@@ -78,7 +76,7 @@ program
             await add(category, id, name, amount, info)
     );
 // Parse the arguments from process.argv
-/* program.parse(); */
+program.parse();
 
 // Create a command for listing categories
 program
@@ -102,4 +100,5 @@ program
             throw new Error("Invalid category specified");
         }
     });
-program.parse();
+
+
