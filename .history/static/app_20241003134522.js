@@ -19,7 +19,6 @@ const populateProducts = async (category, method = "GET", payload) => {
     // Get data
     const res = await fetch(`${API}/${category}`, { method, ...send });
     const data = await res.json();
-    console.log(res);
 
     // Populate products
     for (const product of data) {

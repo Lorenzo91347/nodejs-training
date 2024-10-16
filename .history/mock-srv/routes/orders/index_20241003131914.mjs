@@ -1,6 +1,7 @@
 "use strict";
 import fp from "fastify-plugin";
 import { PassThrough } from "node:stream";
+import websocketPlugin from '@fastify/websocket';  // Import the WebSocket plugin
 
 // Mock data
 const orders = {
@@ -62,15 +63,62 @@ const calculateID = (idPrefix, data) => {
 
 // Plugin
 export default fp(async function (fastify, opts) {
+    // Register WebSocket plugin
+    fastify.register(websocketPlugin);
+
+    // Decorate fastify instance with the current orders logic
     fastify.decorate("currentOrders", currentOrders);
     fastify.decorate("realtimeOrders", realtimeOrdersSimulator);
     fastify.decorate("addOrder", addOrder);
-    console.log("addOrder has been decorated");
-
     fastify.decorate("mockDataInsert", function (request, category, data) {
         const idPrefix = catToPrefix[category];
         const id = calculateID(idPrefix, data);
         data.push({ id, ...request.body });
         return data;
+    });
+
+    // WebSocket route and logic
+    function monitorMessages(socket) {
+        socket.on("message", (data) => {
+            const message = JSON.parse(data);
+            try {
+                if (message.cmd === "update-category") {
+                    return sendCurrentOrders(message.payload.category, socket);
+                }
+            } catch (err) {
+                fastify.log.warn(
+                    "WebSocket Message (data: %o) Error: %s",
+                    message,
+                    err.message
+                );
+            }
+        });
+    }
+
+    function sendCurrentOrders(category, socket) {
+        const orders = Array.from(fastify.currentOrders(category));
+        for (const order of orders) {
+            socket.send(order);
+        }
+    }
+
+    fastify.get(
+        "/:category",
+        { websocket: true },
+        async ({ socket }, request) => {
+            monitorMessages(socket);
+            sendCurrentOrders(request.params.category, socket);
+            for await (const order of fastify.realtimeOrders()) {
+                if (socket.readyState >= socket.CLOSING) break;
+                socket.send(order);
+            }
+        }
+    );
+
+    // HTTP POST route for adding orders
+    fastify.post("/:id", async (request) => {
+        const { id } = request.params;
+        fastify.addOrder(id, request.body.amount);
+        return { ok: true };
     });
 });

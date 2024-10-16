@@ -26,7 +26,7 @@ async function* realtimeOrdersSimulator() {
 }
 
 // Add order to stream and update total
-function addOrder(id, amount) {
+export function addOrder(id, amount) {
     if (orders.hasOwnProperty(id) === false) {
         const err = new Error(`Order ${id} not found`);
         err.status = 404;

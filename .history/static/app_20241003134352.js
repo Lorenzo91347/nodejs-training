@@ -19,7 +19,6 @@ const populateProducts = async (category, method = "GET", payload) => {
     // Get data
     const res = await fetch(`${API}/${category}`, { method, ...send });
     const data = await res.json();
-    console.log(res);
 
     // Populate products
     for (const product of data) {
@@ -45,15 +44,6 @@ let socket = null;
 const realtimeOrders = (category) => {
     if (socket) socket.close();
     socket = new WebSocket(`${WS_API}/orders/${category}`);
-    socket.addEventListener("open", () => {
-        console.log("WebSocket connection established");
-    });
-    socket.addEventListener("error", (err) => {
-        console.error("WebSocket error:", err);
-    });
-    socket.addEventListener("close", () => {
-        console.log("WebSocket connection closed");
-    });
     socket.addEventListener("message", ({ data }) => {
         try {
             const { id, total } = JSON.parse(data);

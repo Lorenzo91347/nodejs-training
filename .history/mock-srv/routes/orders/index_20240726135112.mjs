@@ -3,24 +3,22 @@ import Fastify from 'fastify';
 import websocketPlugin from '@fastify/websocket';
 
 export default async function (fastify, opts) {
-    /*   function monitorMessages(socket) {
-          socket.on("message", (data) => {
-              const message = JSON.parse(data);
-              try {
-                  if (message.cmd === "update-category") {
-                      return sendCurrentOrders(message.payload.category, socket);
-                  }
-              } catch (err) {
-                  fastify.log.warn(
-                      "WebSocket Message (data: %o) Error: %s",
-                      message,
-                      err.message
-                  );
-              }
-          });
-      } */
-
-
+    function monitorMessages(socket) {
+        socket.on("message", (data) => {
+            const message = JSON.parse(data);
+            try {
+                if (message.cmd === "update-category") {
+                    return sendCurrentOrders(message.payload.category, socket);
+                }
+            } catch (err) {
+                fastify.log.warn(
+                    "WebSocket Message (data: %o) Error: %s",
+                    message,
+                    err.message
+                );
+            }
+        });
+    }
 
     function sendCurrentOrders(category, socket) {
         const orders = Array.from(fastify.currentOrders(category));

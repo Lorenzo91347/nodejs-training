@@ -1,24 +1,25 @@
 "use strict";
+import { addOrder } from '../../plugins/data-utils';
 import Fastify from 'fastify';
 import websocketPlugin from '@fastify/websocket';
 
 export default async function (fastify, opts) {
-    /*   function monitorMessages(socket) {
-          socket.on("message", (data) => {
-              const message = JSON.parse(data);
-              try {
-                  if (message.cmd === "update-category") {
-                      return sendCurrentOrders(message.payload.category, socket);
-                  }
-              } catch (err) {
-                  fastify.log.warn(
-                      "WebSocket Message (data: %o) Error: %s",
-                      message,
-                      err.message
-                  );
-              }
-          });
-      } */
+    function monitorMessages(socket) {
+        socket.on("message", (data) => {
+            const message = JSON.parse(data);
+            try {
+                if (message.cmd === "update-category") {
+                    return sendCurrentOrders(message.payload.category, socket);
+                }
+            } catch (err) {
+                fastify.log.warn(
+                    "WebSocket Message (data: %o) Error: %s",
+                    message,
+                    err.message
+                );
+            }
+        });
+    }
 
 
 
@@ -44,7 +45,7 @@ export default async function (fastify, opts) {
 
     fastify.post("/:id", async (request) => {
         const { id } = request.params;
-        fastify.addOrder(id, request.body.amount);
+        addOrder(id, request.body.amount);
         return { ok: true };
     });
 }

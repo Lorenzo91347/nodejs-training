@@ -65,8 +65,6 @@ export default fp(async function (fastify, opts) {
     fastify.decorate("currentOrders", currentOrders);
     fastify.decorate("realtimeOrders", realtimeOrdersSimulator);
     fastify.decorate("addOrder", addOrder);
-    console.log("addOrder has been decorated");
-
     fastify.decorate("mockDataInsert", function (request, category, data) {
         const idPrefix = catToPrefix[category];
         const id = calculateID(idPrefix, data);

@@ -5,7 +5,7 @@ import { Command } from "commander";
 // Create a new Command Program
 const program = new Command();
 
-// API  variable, can be adapted to a production URL 
+// API  variabel, can be adapted to a production URL 
 
 const API = "http://localhost:3000";
 

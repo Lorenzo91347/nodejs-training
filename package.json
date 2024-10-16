@@ -18,10 +18,10 @@
   "license": "MIT",
   "dependencies": {
     "@fastify/websocket": "^10.0.1",
+    "commander": "^12.1.0",
     "fastify": "^4.28.1",
     "fastify-cli": "^6.2.1",
     "got": "^14.4.2",
     "serve": "^14.2.3"
-  },
-  "devDependencies": {}
+  }
 }
