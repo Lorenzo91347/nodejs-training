@@ -1,8 +1,7 @@
 // Import GOT to make HTTP requests
 import { got } from "got";
 import {
-    log,
-    error,
+    displayTimestamp,
     displayAmount,
     displayCategory,
     displayID,
@@ -12,14 +11,20 @@ import {
     displayRRP,
     displaySuccess,
     displayText,
-    displayTimestamp
 } from "./displays.js";
-
 // Set the API URL
 const API = "http://localhost:3000";
-
 // Set the categories
-export const categories = ["confectionery", "electronics"];
+const categories = ["confectionery", "electronics"];
+
+// Log the usage of the command to the console
+export const log = (msg) => {
+    console.log(`\n${msg}\n`);
+};
+// Log the error to the console
+export const error = (msg) => {
+    console.error(`\n${msg}\n`);
+};
 
 // Update the order with the given ID
 export async function update(id, amount) {
@@ -31,7 +36,7 @@ export async function update(id, amount) {
     );
     try {
         if (isNaN(+amount)) {
-            error(" must be a number");
+            error("<AMOUNT> must be a number");
             process.exit(1);
         }
         // Use GOT to make a POST request to the API
@@ -55,20 +60,10 @@ export async function update(id, amount) {
 export async function add(...args) {
     // Destructure the arguments
     let [category, id, name, amount, info] = args;
-    log(`${displayTimestamp()}`);
-    log(
-        `${displayInfo(`Request to add item to category`)} ${displayCategory(
-            category
-        )}`
-    );
-    log(
-        `${displayText("Adding item")} ${displayID(id)} ${displayText(
-            "with amount"
-        )} ${displayAmount(`$${amount}`)}`
-    );
+    log(`Adding item ${id} with amount ${amount}`);
     try {
         if (isNaN(+amount)) {
-            error(`<AMOUNT> must be a number`);
+            error(`Error: <AMOUNT> must be a number`);
             process.exit(1);
         }
         // Use GOT to make a POST request to the API
@@ -81,13 +76,7 @@ export async function add(...args) {
             },
         });
         // Log the result to the console
-        log(
-            `${displaySuccess("Product Added! :")} ${displayID(id)} ${displayText("-")} ${displayName(
-                name
-            )} ${displayText("has been added to the")} ${displayCategory(
-                category
-            )} ${displayText("category")}`
-        );
+        log(`Item "${id}:${name}" has been added to the ${category} category`);
     } catch (err) {
         // If there is an error, log it to the console and exit
         error(err.message);
@@ -97,12 +86,10 @@ export async function add(...args) {
 
 // List the categories
 export function listCategories() {
-    log(displayTimestamp());
-    log(displayInfo("Listing Categories"));
+    log("Listing categories");
     try {
         // Loop through the categories and log them to the console
-        log(displayText("Categories received from API:"));
-        for (const cat of categories) log(displayCategory(cat));
+        for (const cat of categories) log(cat);
     } catch (err) {
         // If there is an error, log it to the console and exit
         error(err.message);
@@ -112,21 +99,15 @@ export function listCategories() {
 
 // List the IDs for the given category
 export async function listCategoryItems(category) {
-    log(displayTimestamp());
-    log(`${displayInfo(`List IDs`)}`);
-
+    log(`Listing IDs for category ${category}`);
     try {
         // Use GOT to make a GET request to the API
         const result = await got(`${API}/${category}/`).json();
         // Log the result to the console
-        log(`${displaySuccess("IDs received from API:")}`);
         for (const item of result) {
-            log(`
-${displayKey("ID:")}\t${displayID(item.id)}
-${displayKey(`Name:`)}\t${displayName(item.name)}
-${displayKey("RRP:")}\t${displayRRP(item.rrp)}
-${displayKey("Product Info:")}\n\t${displayText(item.info)}
-`);
+            log(
+                `${item.id}: ${item.name} - $${item.rrp}\nProduct Info:\t${item.info}`
+            );
         }
     } catch (err) {
         // If there is an error, log it to the console and exit

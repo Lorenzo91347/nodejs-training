@@ -3,73 +3,82 @@ import { Command } from "commander";
 import { update, add, listCategories, listCategoryItems, categories } from "../src/utils.js";
 import { interactiveApp } from "../src/prompts.js";
 
-export const program = new Command();
+// Create a new Command Program
+const program = new Command(); // Declare `program` here at the top
 
+// Configure `program` commands and options
 program
     .name("my-cli")
     .description("Back office for My App")
     .version("1.0.0")
     .option("-i, --interactive", "Run App in interactive mode");
 
-// Update command
+// Update command configuration
 program
     .command("update")
     .description("Update an order")
+    .option("-i, --interactive", "Run Update Command in interactive mode")
     .argument("[ID]", "Order ID")
     .argument("[AMOUNT]", "Order Amount");
 
-// Add command
+// Add command configuration
 program
     .command("add")
     .description("Add Product by ID to a Category")
+    .option("-i, --interactive", "Run Update Command in interactive mode")
     .argument("[CATEGORY]", "Product Category")
     .argument("[ID]", "Product ID")
     .argument("[NAME]", "Product Name")
     .argument("[AMOUNT]", "Product RRP")
     .argument("[INFO...]", "Product Info");
 
-// List command
+// List command configuration
 program
     .command("list")
     .description("List categories")
+    .option("-i, --interactive", "Run Update Command in interactive mode")
     .option("-a, --all", "List all categories")
     .argument("[CATEGORY]", "Category to list IDs for");
 
-async function main() {
-    // Parse and process options and arguments
-    program.parse(process.argv);
+async function main(program) {
+    const command = program?.args.at(0) || "";
+    const cliArgs = program?.args.slice(1) || [];
+    const options = program?.opts() || {};
 
-    const options = program.opts();
-    const [command, ...args] = program.args;
-
-    if (options.interactive) {
-        // Handle interactive mode for the specific command if provided
+    if (!command && !options.interactive) {
+        program.help();
+    }
+    if (!command && options.interactive) {
+        return interactiveApp();
+    }
+    if (command && options.interactive) {
         return interactiveApp(command);
+    }
+    if (options.interactive && cliArgs.length > 0) {
+        program.error("Cannot specify both interactive and command");
     }
 
     switch (command) {
         case "add": {
-            const [category, id, name, amount, info] = args;
-            if (!categories.includes(category) || !id || !name || !amount) {
+            const [category, id, name, amount, info] = cliArgs;
+            if (!categories.includes(category) || !category || !id || !name || !amount) {
                 program.error("Invalid arguments specified for 'add'.");
             }
             await add(category, id, name, amount, info);
             break;
         }
         case "update": {
-            const [id, amount] = args;
+            const [id, amount] = cliArgs;
             if (!id || !amount) {
-                program.error("You must provide both 'ID' and 'AMOUNT' for the update command.");
+                program.error("Invalid arguments specified for 'update'.");
             }
             await update(id, amount);
             break;
         }
         case "list": {
-            const { all } = program.commands.find(cmd => cmd.name() === "list").opts();
-            const [category] = args;
-            if (category && all) {
-                program.error("Cannot specify both category and 'all'");
-            }
+            const { all } = options;
+            const [category] = cliArgs;
+            if (category && all) program.error("Cannot specify both category and 'all'");
             if (all || category === "all") {
                 listCategories();
             } else if (categories.includes(category)) {
@@ -80,10 +89,16 @@ async function main() {
             break;
         }
         default:
-            program.help(); // Shows help if no valid command is provided
+            await interactiveApp();
     }
 }
 
-main();
+// Parse the arguments from process.argv
+program.parse(process.argv);
+
+// Call `main` after parsing to handle the logic
+main(program);
+
+
 
 
